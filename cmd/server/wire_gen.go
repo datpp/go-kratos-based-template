@@ -7,11 +7,11 @@
 package main
 
 import (
-	"github.com/go-kratos/kratos-layout/internal/biz"
-	"github.com/go-kratos/kratos-layout/internal/conf"
-	"github.com/go-kratos/kratos-layout/internal/data"
-	"github.com/go-kratos/kratos-layout/internal/server"
-	"github.com/go-kratos/kratos-layout/internal/service"
+	"github.com/datpp/go-kratos-based-template/internal/biz"
+	"github.com/datpp/go-kratos-based-template/internal/conf"
+	"github.com/datpp/go-kratos-based-template/internal/data"
+	"github.com/datpp/go-kratos-based-template/internal/server"
+	"github.com/datpp/go-kratos-based-template/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -28,11 +28,11 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	if err != nil {
 		return nil, nil, err
 	}
-	greeterRepo := data.NewGreeterRepo(dataData, logger)
-	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logger)
-	greeterService := service.NewGreeterService(greeterUsecase)
-	grpcServer := server.NewGRPCServer(confServer, greeterService, logger)
-	httpServer := server.NewHTTPServer(confServer, greeterService, logger)
+	healthcheckRepo := data.NewHealthcheckRepo(dataData, logger)
+	healthcheckUsecase := biz.NewHealthcheckUsecase(healthcheckRepo, logger)
+	healthcheckService := service.NewHealthcheckService(healthcheckUsecase)
+	grpcServer := server.NewGRPCServer(confServer, healthcheckService, logger)
+	httpServer := server.NewHTTPServer(confServer, healthcheckService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

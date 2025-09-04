@@ -3,37 +3,30 @@
 
 openapi: 3.0.3
 info:
-    title: Greeter API
-    description: The greeting service definition.
+    title: HealthCheck API
+    description: The HealthCheck service definition.
     version: 0.0.1
 paths:
-    /helloworld/{name}:
+    /healthz:
         get:
             tags:
-                - Greeter
-                - subgroup
-            description: Sends a greeting
-            operationId: Greeter_SayHello
-            parameters:
-                - name: name
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - HealthCheck
+            description: Getting a healthcheck status
+            operationId: HealthCheck_HealthCheck
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+                                $ref: '#/components/schemas/healthcheck.v1.HealthCheckResponse'
 components:
     schemas:
-        helloworld.v1.HelloReply:
+        healthcheck.v1.HealthCheckResponse:
             type: object
             properties:
-                message:
+                status:
                     type: string
-            description: The response message containing the greetings
+            description: The response message containing the health check status
 tags:
-    - name: Greeter
+    - name: HealthCheck

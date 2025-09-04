@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package healthcheck.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/datpp/go-kratos-based-template/api/healthcheck/v1;v1";
+option java_multiple_files = true;
+option java_package = "kratos.api.healthcheck.v1";
+option java_outer_classname = "HealthCheckProtoV1";
+
+// The HealthCheck service definition.
+service HealthCheck {
+  // Getting a healthcheck status
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/healthz"
+    };
+  }
+}
+
+message HealthCheckRequest {}
+
+// The response message containing the health check status
+message HealthCheckResponse {
+  string status = 1;
+}
