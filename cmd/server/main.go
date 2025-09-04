@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/datpp/go-kratos-based-template/internal/conf"
+	"github.com/datpp/go-kratos-based-template/packages/types"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -19,6 +20,8 @@ import (
 
 // go build -ldflags "-X main.Version=x.y.z"
 var (
+	AppInfo types.AppInfo
+
 	// Name is the name of the compiled software.
 	Name string
 	// Version is the version of the compiled software.
@@ -31,13 +34,18 @@ var (
 
 func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+
+	AppInfo = types.AppInfo{
+		Name:    &Name,
+		Version: &Version,
+	}
 }
 
-func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(appInfo types.AppInfo, logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
-		kratos.Name(Name),
-		kratos.Version(Version),
+		kratos.Name(*appInfo.Name),
+		kratos.Version(*appInfo.Version),
 		kratos.Metadata(map[string]string{}),
 		kratos.Logger(logger),
 		kratos.Server(
@@ -53,8 +61,8 @@ func main() {
 		"ts", log.DefaultTimestamp,
 		"caller", log.DefaultCaller,
 		"service.id", id,
-		"service.name", Name,
-		"service.version", Version,
+		"service.name", *AppInfo.Name,
+		"service.version", *AppInfo.Version,
 		"trace.id", tracing.TraceID(),
 		"span.id", tracing.SpanID(),
 	)
@@ -74,7 +82,7 @@ func main() {
 		panic(err)
 	}
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, logger)
+	app, cleanup, err := wireApp(AppInfo, bc.Server, bc.Data, logger)
 	if err != nil {
 		panic(err)
 	}

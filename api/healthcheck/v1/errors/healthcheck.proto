@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package healthcheck.v1;
+
+option go_package = "github.com/datpp/go-kratos-based-template/api/healthcheck/v1/errors;v1_errors";
+option java_multiple_files = true;
+option java_package = "healthcheck.v1.errors";
+option objc_class_prefix = "HealthCheckV1Errors";
+
+import "errors/errors.proto";
+
+enum HealthcheckV1ErrorReason {
+  option (errors.default_code) = 500;
+  option (errors.default_message) = "Internal server error";
+
+  HEALTHCHECK_UNSPECIFIED = 0 [(errors.code) = 500];
+}

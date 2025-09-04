@@ -3,14 +3,7 @@ package biz
 import (
 	"context"
 
-	v1 "github.com/datpp/go-kratos-based-template/api/healthcheck/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
-)
-
-var (
-	Unspecified = errors.New(500, v1.HealthcheckV1ErrorReason_HEALTHCHECK_UNSPECIFIED.String(), "unknown error")
 )
 
 // Healthcheck is a Healthcheck model.

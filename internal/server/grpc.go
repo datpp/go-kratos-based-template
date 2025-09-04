@@ -4,6 +4,8 @@ import (
 	v1 "github.com/datpp/go-kratos-based-template/api/healthcheck/v1"
 	"github.com/datpp/go-kratos-based-template/internal/conf"
 	"github.com/datpp/go-kratos-based-template/internal/service"
+	"github.com/go-kratos/kratos/v2/middleware/metrics"
+	"github.com/go-kratos/kratos/v2/middleware/validate"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
@@ -11,10 +13,15 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, healthcheck *service.HealthcheckService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, healthcheck *service.HealthcheckService, m *Metrics, logger log.Logger) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
+			validate.Validator(),
+			metrics.Server(
+				metrics.WithSeconds(m.Seconds),
+				metrics.WithRequests(m.Requests),
+			),
 		),
 	}
 	if c.Grpc.Network != "" {
