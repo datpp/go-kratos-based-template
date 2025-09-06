@@ -71,6 +71,7 @@ generate:
 # generate all
 all:
 	make api;
+	make errors;
 	make config;
 	make generate;
 

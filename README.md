@@ -27,6 +27,8 @@ go build -o ./bin/ ./...
 make init
 # Generate API files (include: pb.go, http, grpc, validate, swagger) by proto file
 make api
+# Generate error files
+make errors 
 # Generate all files
 make all
 ```

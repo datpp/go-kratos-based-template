@@ -8,10 +8,7 @@ import (
 	v1 "github.com/datpp/go-kratos-based-template/api/healthcheck/v1"
 	"github.com/datpp/go-kratos-based-template/internal/conf"
 	"github.com/datpp/go-kratos-based-template/internal/service"
-	"github.com/datpp/go-kratos-based-template/packages/types"
-	"github.com/datpp/go-kratos-based-template/packages/utils"
-	"google.golang.org/grpc/encoding"
-
+	"github.com/datpp/go-kratos-based-template/pkg/types"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/validate"
@@ -32,18 +29,7 @@ func NewHTTPServer(c *conf.Server, healthcheck *service.HealthcheckService, m *M
 				metrics.WithRequests(m.Requests),
 			),
 		),
-		http.RequestDecoder(RequestDecoder),
-		http.ResponseEncoder(func(w http.ResponseWriter, r *http.Request, v interface{}) error {
-			response := types.StandardResponse{
-				Code: http2.StatusOK,
-				Data: v,
-			}
-			data, _ := json.Marshal(response)
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http2.StatusOK)
-			w.Write(data)
-			return nil
-		}),
+		http.ResponseEncoder(ResponseEncode),
 	}
 	if c.Http.Network != "" {
 		opts = append(opts, http.Network(c.Http.Network))
@@ -60,17 +46,18 @@ func NewHTTPServer(c *conf.Server, healthcheck *service.HealthcheckService, m *M
 	return srv
 }
 
-func RequestDecoder(r *http.Request, v interface{}) error {
-	return nil
-}
-
-// CodecForRequest get encoding.Codec via http.Request
-func CodecForRequest(r *http.Request, name string) (encoding.Codec, bool) {
-	for _, accept := range r.Header[name] {
-		codec := encoding.GetCodec(utils.ContentSubtype(accept))
-		if codec != nil {
-			return codec, true
+func ResponseEncode(w http.ResponseWriter, r *http.Request, v interface{}) error {
+	// replace _ with your custom response struct
+	switch v.(type) {
+	default:
+		response := types.StandardResponse{
+			Code: http2.StatusOK,
+			Data: v,
 		}
+		data, _ := json.Marshal(response)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http2.StatusOK)
+		w.Write(data)
 	}
-	return encoding.GetCodec("json"), false
+	return nil
 }

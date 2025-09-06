@@ -12,7 +12,7 @@ import (
 	"github.com/datpp/go-kratos-based-template/internal/data"
 	"github.com/datpp/go-kratos-based-template/internal/server"
 	"github.com/datpp/go-kratos-based-template/internal/service"
-	"github.com/datpp/go-kratos-based-template/packages/types"
+	"github.com/datpp/go-kratos-based-template/pkg/utils/bootstrap"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -23,8 +23,8 @@ import (
 
 // Injectors from wire.go:
 
-// wireApp init kratos application.
-func wireApp(appInfo types.AppInfo, confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
+// initApp init kratos application.
+func initApp(serviceInfo bootstrap.ServiceInfo, confServer *conf.Server, confData *conf.Data, registry *conf.Registry, logger log.Logger) (*kratos.App, func(), error) {
 	dataData, cleanup, err := data.NewData(confData, logger)
 	if err != nil {
 		return nil, nil, err
@@ -32,14 +32,15 @@ func wireApp(appInfo types.AppInfo, confServer *conf.Server, confData *conf.Data
 	healthcheckRepo := data.NewHealthcheckRepo(dataData, logger)
 	healthcheckUsecase := biz.NewHealthcheckUsecase(healthcheckRepo, logger)
 	healthcheckService := service.NewHealthcheckService(healthcheckUsecase)
-	metrics, err := server.NewMetrics(appInfo)
+	metrics, err := server.NewMetrics(serviceInfo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
 	grpcServer := server.NewGRPCServer(confServer, healthcheckService, metrics, logger)
 	httpServer := server.NewHTTPServer(confServer, healthcheckService, metrics, logger)
-	app := newApp(appInfo, logger, grpcServer, httpServer)
+	registrar := server.NewRegistrar(registry, logger)
+	app := newApp(logger, grpcServer, httpServer, registrar)
 	return app, func() {
 		cleanup()
 	}, nil
