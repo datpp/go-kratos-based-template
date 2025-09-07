@@ -19,7 +19,7 @@ import (
 // go build -ldflags "-X main.Service.Version=x.y.z"
 var (
 	Service = bootstrap.NewServiceInfo(
-		"kratos.your-service",
+		"go-kratos-based-template",
 		"1.0.0",
 		"",
 	)
